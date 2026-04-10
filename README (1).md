@@ -73,52 +73,25 @@ The program takes a positive integer as a command-line argument, creates a child
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <ctype.h>
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("Usage: %s <positive integer>\n", argv[0]);
-        exit(1);
-    }
-
-    for (int i = 0; argv[1][i] != '\0'; i++) {
-        if (!isdigit(argv[1][i])) {
-            printf("Error: Input must be a positive integer\n");
-            exit(1);
-        }
-    }
+    if (argc < 2) return 1;
 
     int n = atoi(argv[1]);
-
-    if (n <= 0) {
-        printf("Error: Input must be greater than 0\n");
-        exit(1);
-    }
-
     pid_t pid = fork();
 
-    if (pid < 0) {
-        printf("Fork failed\n");
-        exit(1);
-    }
-    else if (pid == 0) {
-        printf("Child PID: %d\n", getpid());
-        printf("Sequence: ");
+    if (pid == 0) {
         while (n >= 1) {
-            printf("%d", n);
-            if (n == 1) break;
-            printf(", ");
-            n = n / 2;
+            printf("%d%s", n, (n == 1) ? "" : ", ");
+            n /= 2;
         }
         printf("\n");
-        exit(0);
-    }
-    else {
-        printf("Parent PID: %d, Child PID: %d\n", getpid(), pid);
+    } 
+    else if (pid > 0) {
         wait(NULL);
-        printf("Child finished. Parent exiting.\n");
-        exit(0);
     }
+
+    return 0;
 }
 ```
 
