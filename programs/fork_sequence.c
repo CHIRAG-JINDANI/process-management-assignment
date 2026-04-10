@@ -2,53 +2,42 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <ctype.h>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     if (argc != 2) {
-        printf("usage: %s <positive integer>\n", argv[0]);
-        exit(1);
-    }
-
-    for (int i = 0; argv[1][i] != '\0'; i++) {
-        if (!isdigit(argv[1][i])) {
-            printf("error: input must be a positive integer\n");
-            exit(1);
-        }
+        printf("Enter one positive number\n");
+        return 1;
     }
 
     int n = atoi(argv[1]);
 
     if (n <= 0) {
-        printf("error: input must be greater than 0\n");
-        exit(1);
+        printf("Number must be positive\n");
+        return 1;
     }
 
-    pid_t pid = fork();
+    int pid = fork();
 
-    if (pid < 0) {
-        printf("fork failed\n");
-        exit(1);
-    }
+    if (pid == 0)   // child process
+    {
+        printf("Child PID: %d\n", getpid());
 
-    else if (pid == 0) {
-        printf("child pid: %d\n", getpid());
-        printf("sequence: ");
-        while (n >= 1) {
-            printf("%d", n);
-            if (n == 1) break;
-            printf(", ");
+        printf("Sequence: ");
+        while (n >= 1)
+        {
+            printf("%d ", n);
             n = n / 2;
         }
+
         printf("\n");
-        exit(0);
     }
-
-    else {
-        printf("parent pid: %d, child pid: %d\n", getpid(), pid);
+    else            // parent process
+    {
+        printf("Parent PID: %d\n", getpid());
         wait(NULL);
-        printf("child finished. parent exiting.\n");
-        exit(0);
+        printf("Child finished\n");
     }
-}
 
+    return 0;
+}
